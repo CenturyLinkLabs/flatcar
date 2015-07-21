@@ -15,7 +15,7 @@ Gem::Specification.new do |gem|
   gem.require_paths = %w(lib)
   gem.version       = Flatcar::VERSION
   gem.required_ruby_version = '>= 2.2.2'
-  # gem.add_dependency 'excon', '>= 0.27.4'
+  gem.add_dependency 'rails', '~> 4.2'
   gem.add_development_dependency 'rake'
   gem.add_development_dependency 'rspec', '~> 3.3'
   gem.add_development_dependency 'simplecov', '~> 0.10.0'
