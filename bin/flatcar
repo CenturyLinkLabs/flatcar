@@ -1,2 +1,9 @@
 #!/usr/bin/env ruby
 require 'flatcar'
+
+begin
+  Flatcar::Runner.new(ARGV).execute
+rescue Exception => e
+  puts e.message
+  exit 0
+end
