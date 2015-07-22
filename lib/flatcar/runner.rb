@@ -15,13 +15,12 @@ module Flatcar
       when 'new'
         @name = args.shift || 'we_have_app'
         options = args
-        puts 'before exec rails new'
-        `rails #{command} #{name} -B #{options.join(' ')}`
-        puts 'after exec rails'
+        system("rails #{command} #{name} -B #{options.join(' ')}")
         create_from_template('Dockerfile.erb', 'Dockerfile')
-        `cd #{name} && docker build -t #{name} .`
+        puts "cd #{name} && docker build -t #{name} ."
+        system("cd #{name} && docker build -t #{name} .")
       when 'run'
-        exec "docker run -it -v #{Dir.pwd}:/var/app -w /var/app -p 3000:3000 centurylink/flatcar-base rails s"
+        system("docker run -it -v #{Dir.pwd}:/var/app -w /var/app -p 3000:3000 centurylink/flatcar-base rails s")
       else
         puts "Error: Command '#{command}' not recognized"
       end

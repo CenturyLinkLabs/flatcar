@@ -1,3 +1,4 @@
 FROM centurylink/flatcar-base
 
-RUN rake db:create && rake db:migrate && rake db:seed && rails s
+RUN curl --silent --location https://deb.nodesource.com/setup_0.12 | bash - && apt-get install -y nodejs
+RUN bundle exec rake db:create && bundle exec rake db:migrate && bundle exec rake db:seed && bundle exec rails s
