@@ -22,7 +22,7 @@ module Flatcar
         puts "cd #{name}/ && docker-compose build"
         system("cd #{name}/ && docker-compose build")
       when 'run'
-        system("docker-compose run ")
+        system("docker-compose up")
       else
         puts "Error: Command '#{command}' not recognized"
       end
@@ -37,7 +37,7 @@ module Flatcar
     def create_from_template(template_name, output_file)
       template = ERB.new(File.read("#{templates}/#{template_name}"), nil, '-')
       result = template.result(binding)
-      puts "MAKIN THAT DOCKERFILE!"
+      puts "MAKIN' THAT DOCKER THING!"
       File.open("#{name}/#{output_file}", 'w') { |file| file.write(result) }
     end
 
