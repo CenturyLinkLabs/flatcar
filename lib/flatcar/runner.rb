@@ -19,11 +19,10 @@ module Flatcar
         create_from_template('Dockerfile.erb', 'Dockerfile')
         create_from_template('Dockerfile-pro.erb', 'Dockerfile-pro')
         create_from_template('docker-compose.yml.erb', 'docker-compose.yml')
-        puts "cd #{name} && docker build -t #{name} ."
-        system("cd #{name} && docker build -t #{name} .")
+        puts "cd #{name}/ && docker-compose build"
+        system("cd #{name}/ && docker-compose build")
       when 'run'
-        # system("docker run -it -v #{Dir.pwd}:/var/app -w /var/app -p 3000:3000 centurylink/flatcar-base rails s")
-        system("docker-compose up")
+        system("docker-compose run ")
       else
         puts "Error: Command '#{command}' not recognized"
       end

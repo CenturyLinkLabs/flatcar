@@ -1,3 +1,8 @@
 FROM centurylink/flatcar-base
 
-RUN bundle exec rake db:create && bundle exec rake db:migrate && bundle exec rake db:seed && bundle exec rails s
+ADD . /usr/src/app
+WORKDIR /usr/src/app
+RUN bundle install \
+  && bundle exec rake db:create \
+  && bundle exec rake db:migrate \
+  && bundle exec rake db:seed
