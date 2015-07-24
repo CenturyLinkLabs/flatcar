@@ -17,10 +17,13 @@ module Flatcar
         options = args
         system("rails #{command} #{name} -B #{options.join(' ')}")
         create_from_template('Dockerfile.erb', 'Dockerfile')
+        create_from_template('Dockerfile-pro.erb', 'Dockerfile-pro')
+        create_from_template('docker-compose.yml.erb', 'docker-compose.yml')
         puts "cd #{name} && docker build -t #{name} ."
         system("cd #{name} && docker build -t #{name} .")
       when 'run'
-        system("docker run -it -v #{Dir.pwd}:/var/app -w /var/app -p 3000:3000 centurylink/flatcar-base rails s")
+        # system("docker run -it -v #{Dir.pwd}:/var/app -w /var/app -p 3000:3000 centurylink/flatcar-base rails s")
+        system("docker-compose up")
       else
         puts "Error: Command '#{command}' not recognized"
       end

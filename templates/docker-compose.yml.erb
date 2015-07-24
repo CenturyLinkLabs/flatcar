@@ -1,0 +1,12 @@
+webapp:
+  build: .
+  #  how will this indent?
+  <% if @build_env == :production %>
+    dockerfile: Dockerfile-pro
+  <% end %>
+  ports:
+    - "3000:3000"
+  volumes:
+    - <%= Dir.pwd %>:/var/app
+  working_dir: /var/app
+  command: rails s
