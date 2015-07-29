@@ -15,7 +15,7 @@ module Flatcar
     private
 
     def templates
-      File.join File.expand_path('../flatcar/',  File.dirname(__dir__)), 'templates'
+      File.join File.expand_path('flatcar/',  File.dirname(__dir__)), 'templates'
     end
 
     def create_from_template(template_name, output_file)
