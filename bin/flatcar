@@ -1,9 +1,17 @@
 #!/usr/bin/env ruby
+require 'gli'
 require 'flatcar'
 
-begin
-  Flatcar::Runner.new(ARGV).execute
-rescue Exception => e
-  puts e.message
-  exit 0
-end
+include GLI::App
+
+program_desc 'Flatcar is a CLI for developing Ruby on Rails web applications intended to be deployed as containerized Docker services'
+
+version Flatcar::VERSION
+
+subcommand_option_handling :normal
+
+arguments :strict
+
+commands_from 'flatcar/commands'
+
+exit run(ARGV)

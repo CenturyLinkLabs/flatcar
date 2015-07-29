@@ -1,0 +1,5 @@
+= flatcar
+
+Generate this with
+    flatcar rdoc
+After you have described your command line interface
