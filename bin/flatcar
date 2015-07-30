@@ -10,7 +10,7 @@ version Flatcar::VERSION
 
 subcommand_option_handling :normal
 
-arguments :strict
+arguments :loose
 
 commands_from 'flatcar/commands'
 
