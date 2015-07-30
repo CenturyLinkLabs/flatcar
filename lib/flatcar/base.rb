@@ -1,9 +1,10 @@
 module Flatcar
   class Base
-    attr_accessor :args
+    attr_accessor :args, :options
 
-    def initialize(args)
+    def initialize(args, options={})
       @args = args
+      @options = options
     end
   end
 end
