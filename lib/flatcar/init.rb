@@ -1,16 +1,20 @@
 module Flatcar
-  class New < Base
+  class Init < Base
     def execute
-      @name = args.shift || 'we_have_app'
-      # options = args
-      puts("rails new #{@name} -B #{args.join(' ')}")
-      system("rails new #{@name} -B #{args.join(' ')}")
+      @dockerfile_model = Flatcar::TemplateModel.new(@options, @args)
+      @app_path = @dockerfile_model.app_path
+
+      puts("rails new -B #{@app_path}")
+      system("rails new -B #{@app_path}")
+
       create_from_template('Dockerfile.erb', 'Dockerfile')
-      create_from_template('Dockerfile-pro.erb', 'Dockerfile-pro')
       create_from_template('docker-compose.yml.erb', 'docker-compose.yml')
-      puts "cd #{@name}/ && docker-compose build"
-      system("cd #{@name}/ && docker-compose build")
+
+      puts "cd #{@app_path}/ && docker-compose build"
+      system("cd #{@app_path}/ && docker-compose build")
     end
+
+
 
     private
 
@@ -20,9 +24,9 @@ module Flatcar
 
     def create_from_template(template_name, output_file)
       template = ERB.new(File.read("#{templates}/#{template_name}"), nil, '-')
-      result = template.result(binding)
+      result = template.result(@dockerfile_model.get_binding)
       puts "MAKIN' THAT DOCKER THING!"
-      File.open("#{@name}/#{output_file}", 'w') { |file| file.write(result) }
+      File.open("#{@app_path}/#{output_file}", 'w') { |file| file.write(result) }
     end
   end
 end

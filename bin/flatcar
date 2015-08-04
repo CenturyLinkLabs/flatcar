@@ -4,13 +4,13 @@ require 'flatcar'
 
 include GLI::App
 
-program_desc 'Flatcar is a CLI for developing Ruby on Rails web applications intended to be deployed as containerized Docker services'
+program_desc 'Flatcar is a CLI for developing Ruby on Rails applications intended to be deployed as containerized Docker services'
 
 version Flatcar::VERSION
 
 subcommand_option_handling :normal
 
-arguments :loose
+arguments :strict
 
 commands_from 'flatcar/commands'
 

@@ -1,8 +1,13 @@
-FROM centurylink/flatcar-base
+<%= dockerfile_header %>
 
-ADD . /usr/src/app
+RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
+
+COPY . /usr/src/app
+
 RUN bundle install \
-  && bundle exec rake db:create \
-  && bundle exec rake db:migrate \
-  && bundle exec rake db:seed
+&& bundle exec rake db:create \
+&& bundle exec rake db:migrate \
+&& bundle exec rake db:seed
+
+EXPOSE 3000

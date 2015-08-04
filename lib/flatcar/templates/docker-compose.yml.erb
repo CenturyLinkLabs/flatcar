@@ -1,9 +1,8 @@
 webapp:
   build: .
-  <%= 'dockerfile: Dockerfile-pro' if @build_env == :production %>
   ports:
     - "3000:3000"
   volumes:
-    - <%= Dir.pwd + "/#{@name}" %>:/usr/src/app
+    - .:/usr/src/app
   working_dir: /usr/src/app
   command: bundle exec rails s -b '0.0.0.0'
