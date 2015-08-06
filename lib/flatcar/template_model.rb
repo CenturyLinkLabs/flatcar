@@ -50,17 +50,21 @@ module Flatcar
     end
 
     def service_link
-      puts 'service_link generating'
       [
         'links:',
-        '  - database:database'
-      ].join("\n") if @database
+        '  - db:db'
+      ].join("\n") if @database != 'sqlite3'
     end
 
     def database_service
       case @database
-        when 'postgres'
-        when 'sqlite'
+      when 'postgres'
+        [
+          'db:',
+          '  image: postgres',
+          '  ports:',
+          '    - "5432"'
+        ].join("\n")
       end
     end
 
