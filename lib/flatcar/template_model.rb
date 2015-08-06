@@ -1,11 +1,12 @@
 module Flatcar
   class TemplateModel
-    attr_accessor :name, :base_image
+    attr_accessor :name, :base_image, :database
 
     def initialize(options, args)
       @options = options.dup
       @args = args.dup
       @base_image = @options[:b]
+      @database = @options[:d]
       @name = project_name
     end
 
@@ -45,6 +46,21 @@ module Flatcar
           'RUN apt-get update && apt-get install -y nodejs --no-install-recommends && rm -rf /var/lib/apt/lists/*',
           'RUN apt-get update && apt-get install -y mysql-client postgresql-client sqlite3 --no-install-recommends && rm -rf /var/lib/apt/lists/*'
         ].join("\n")
+      end
+    end
+
+    def service_link
+      puts 'service_link generating'
+      [
+        'links:',
+        '  - database:database'
+      ].join("\n") if @database
+    end
+
+    def database_service
+      case @database
+        when 'postgres'
+        when 'sqlite'
       end
     end
 

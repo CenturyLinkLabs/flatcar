@@ -8,7 +8,7 @@ module Flatcar
       system("rails new -B #{@app_path}")
 
       create_from_template('Dockerfile.erb', 'Dockerfile')
-      create_from_template('docker-compose.yml.erb', 'docker-compose.yml')
+      create_from_template('docker-compose.erb', 'docker-compose.yml')
 
       puts "cd #{@app_path}/ && docker-compose build"
       system("cd #{@app_path}/ && docker-compose build")
