@@ -81,6 +81,8 @@ module Flatcar
         [
           'db:',
           '  image: postgres',
+          '  volumes_from:',
+          '    - data',
           '  environment:',
           '    - POSTGRES_PASSWORD=mysecretpassword'
         ].join("\n")
@@ -88,8 +90,21 @@ module Flatcar
         [
           'db:',
           '  image: mysql',
+          '  volumes_from:',
+          '    - data',
           '  environment:',
           '    - MYSQL_ROOT_PASSWORD=mysecretpassword'
+        ].join("\n")
+      end
+    end
+
+    def data_volume_service
+      unless @database == 'sqlite3'
+        [
+          'data:',
+          "  image: busybox",#"#{@database == 'postgresql' ? 'postgres' : 'mysql'}",
+          '  volumes:',
+          "    - /var/lib/#{@database}"
         ].join("\n")
       end
     end
