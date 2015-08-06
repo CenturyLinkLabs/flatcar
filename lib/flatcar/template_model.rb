@@ -1,12 +1,21 @@
 module Flatcar
   class TemplateModel
-    attr_accessor :name, :base_image
+    attr_accessor :name, :base_image, :database
 
     def initialize(options, args)
       @options = options.dup
       @args = args.dup
       @base_image = @options[:b]
+      @database = @options[:d]
       @name = project_name
+
+      unless %w(mysql postgresql sqlite3).include? @options[:d]
+        help_now! 'Invalid value for --database option. Must be one of: mysql, postgresql, sqlite3'
+      end
+
+      unless %w(rails alpine ubuntu).include? @base_image
+        help_now! 'Invalid value for --base option. Must be one of: rails, alpine, ubuntu'
+      end
     end
 
     def app_path
@@ -44,6 +53,43 @@ module Flatcar
           'FROM rails:latest',
           'RUN apt-get update && apt-get install -y nodejs --no-install-recommends && rm -rf /var/lib/apt/lists/*',
           'RUN apt-get update && apt-get install -y mysql-client postgresql-client sqlite3 --no-install-recommends && rm -rf /var/lib/apt/lists/*'
+        ].join("\n")
+      end
+    end
+
+    def service_link
+      [
+        'environment:',
+        "    - DATABASE_URL=#{database_url}",
+        '  links:',
+        '    - db:db'
+      ].join("\n") if @database != 'sqlite3'
+    end
+
+    def database_url
+      case @database
+      when 'postgresql'
+        'postgresql://postgres:mysecretpassword@db/'
+      when 'mysql'
+        'mysql2://root:mysecretpassword@db/'
+      end
+    end
+
+    def database_service
+      case @database
+      when 'postgresql'
+        [
+          'db:',
+          '  image: postgres',
+          '  environment:',
+          '    - POSTGRES_PASSWORD=mysecretpassword'
+        ].join("\n")
+      when 'mysql'
+        [
+          'db:',
+          '  image: mysql',
+          '  environment:',
+          '    - MYSQL_ROOT_PASSWORD=mysecretpassword'
         ].join("\n")
       end
     end

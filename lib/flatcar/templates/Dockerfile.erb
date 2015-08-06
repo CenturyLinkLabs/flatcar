@@ -5,9 +5,6 @@ WORKDIR /usr/src/app
 
 COPY . /usr/src/app
 
-RUN bundle install \
-&& bundle exec rake db:create \
-&& bundle exec rake db:migrate \
-&& bundle exec rake db:seed
+RUN bundle install
 
 EXPOSE 3000
