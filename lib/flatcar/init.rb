@@ -18,8 +18,6 @@ module Flatcar
       system("cd #{@app_path}/ && docker-compose build")
     end
 
-
-
     private
 
     def templates
