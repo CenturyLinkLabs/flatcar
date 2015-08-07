@@ -6,7 +6,7 @@ module Flatcar
       project = new(options, args)
       project.write_dockerfile
       project.write_compose_yaml
-      # project.build
+      project.build
     end
 
     def initialize(options, args)
@@ -73,11 +73,10 @@ module Flatcar
 
     def fs_init
       rails_new = "rails new -B #{app_path}"
-      rails_new += " -d #{@database.name}" unless database == 'sqlite3'
+      rails_new += " -d #{@database.name}" if @database
 
       puts(rails_new)
-      system("mkdir #{app_path}")
-      # system(rails_new)
+      system(rails_new)
     end
   end
 end

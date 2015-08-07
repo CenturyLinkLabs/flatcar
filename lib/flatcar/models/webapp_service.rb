@@ -19,7 +19,7 @@ module Flatcar
 
     def compose_block
       [
-        'webapp',
+        'webapp:',
         '  build: .',
         '  ports:',
         '    - "3000:3000"',
@@ -27,7 +27,7 @@ module Flatcar
         '    - .:/usr/src/app',
         '  working_dir: /usr/src/app',
         '  command: bundle exec rails s -b \'0.0.0.0\'',
-        service_link
+        (service_link if @database)
       ].join("\n")
     end
 
@@ -39,7 +39,7 @@ module Flatcar
         "    - DATABASE_URL=#{@database.database_url}",
         '  links:',
         '    - db:db'
-      ].join("\n") unless @database == 'sqlite3'
+      ].join("\n")
     end
 
     def base_image_instruction

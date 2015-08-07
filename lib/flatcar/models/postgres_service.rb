@@ -14,7 +14,8 @@ module Flatcar
         '  volumes_from:',
         '    - data',
         '  environment:',
-        '    - POSTGRES_PASSWORD=mysecretpassword'
+        '    - POSTGRES_PASSWORD=mysecretpassword',
+        data_volume
       ].join("\n")
     end
 

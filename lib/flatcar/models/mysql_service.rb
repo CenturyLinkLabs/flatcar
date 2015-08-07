@@ -14,7 +14,8 @@ module Flatcar
         '  volumes_from:',
         '    - data',
         '  environment:',
-        '    - MYSQL_ROOT_PASSWORD=mysecretpassword'
+        '    - MYSQL_ROOT_PASSWORD=mysecretpassword',
+        data_volume
       ].join("\n")
     end
 
