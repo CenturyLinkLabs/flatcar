@@ -1,7 +1,13 @@
 module Flatcar
   class PostgresService < Service
 
-    def database_service
+    attr_reader :name
+
+    def initialize
+      @name = 'postgresql'
+    end
+
+    def compose_block
       [
         'db:',
         '  image: postgres',

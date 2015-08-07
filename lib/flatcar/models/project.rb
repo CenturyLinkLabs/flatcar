@@ -1,19 +1,19 @@
 module Flatcar
   class Project
-    attr_accessor :name, :database
+    attr_accessor :name, :database, :webapp
 
     def self.init(options, args)
       project = new(options, args)
       project.write_dockerfile
       project.write_compose_yaml
-      project.build
+      # project.build
     end
 
     def initialize(options, args)
       @args = args
       @name = project_name
-      @database = Service.instance(options[:d])
-      @webapp = Service.instance('webapp', base_image: options[:b], database: @database)
+      @database = Flatcar::Service.instance(options[:d])
+      @webapp = Flatcar::Service.instance('webapp', base_image: options[:b], database: @database)
       fs_init
     end
 
@@ -45,6 +45,11 @@ module Flatcar
     end
 
     def write_compose_yaml
+      compose_yaml =
+        [
+          @webapp.compose_block,
+          (@database.compose_block if @database)
+        ].join("\n")
       File.open("#{app_path}/docker-compose.yml", 'w') { |file| file.write(compose_yaml) }
     end
 
@@ -68,10 +73,11 @@ module Flatcar
 
     def fs_init
       rails_new = "rails new -B #{app_path}"
-      rails_new += " -d #{database}" unless database == 'sqlite3'
+      rails_new += " -d #{@database.name}" unless database == 'sqlite3'
 
       puts(rails_new)
-      system(rails_new)
+      system("mkdir #{app_path}")
+      # system(rails_new)
     end
   end
 end

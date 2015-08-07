@@ -35,7 +35,7 @@ module Flatcar
 
     def service_link
       [
-        'environment:',
+        '  environment:',
         "    - DATABASE_URL=#{@database.database_url}",
         '  links:',
         '    - db:db'

@@ -1,7 +1,13 @@
 module Flatcar
   class MysqlService < Service
 
-    def database_service
+    attr_reader :name
+
+    def initialize
+      @name = 'mysql'
+    end
+
+    def compose_block
       [
         'db:',
         '  image: mysql',
