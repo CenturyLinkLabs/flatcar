@@ -10,9 +10,10 @@ module Flatcar
     end
 
     def initialize(options, args)
-      @args = args.dup
-      @database = options[:d]
+      @args = args
       @name = project_name
+      @database = Service.instance(options[:d])
+      @webapp = Service.instance('webapp', base_image: options[:b], database: @database)
       fs_init
     end
 
@@ -37,12 +38,22 @@ module Flatcar
     end
 
     def write_dockerfile
+      puts "MAKIN' THAT DOCKER THING!"
 
+      dockerfile = @webapp.dockerfile
+      File.open("#{app_path}/Dockerfile", 'w') { |file| file.write(dockerfile) }
     end
 
     def write_compose_yaml
-
+      File.open("#{app_path}/docker-compose.yml", 'w') { |file| file.write(compose_yaml) }
     end
+
+
+    # def create_from_template(template_name, output_file)
+    #   template = ERB.new(File.read("#{templates}/#{template_name}"), nil, '-')
+    #   result = template.result(@project.get_binding)
+    #   File.open("#{@app_path}/#{output_file}", 'w') { |file| file.write(result) }
+    # end
 
     def get_binding
       binding()
