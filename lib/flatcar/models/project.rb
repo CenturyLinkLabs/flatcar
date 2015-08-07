@@ -1,21 +1,19 @@
 module Flatcar
   class Project
-    attr_accessor :name, :base_image, :database
+    attr_accessor :name, :database
+
+    def self.init(options, args)
+      project = new(options, args)
+      project.write_dockerfile
+      project.write_compose_yaml
+      project.build
+    end
 
     def initialize(options, args)
-      @options = options.dup
       @args = args.dup
-      @base_image = @options[:b]
-      @database = @options[:d]
+      @database = options[:d]
       @name = project_name
-
-      unless %w(mysql postgresql sqlite3).include? @options[:d]
-        help_now! 'Invalid value for --database option. Must be one of: mysql, postgresql, sqlite3'
-      end
-
-      unless %w(rails alpine ubuntu).include? @base_image
-        help_now! 'Invalid value for --base option. Must be one of: rails, alpine, ubuntu'
-      end
+      fs_init
     end
 
     def app_path
@@ -38,9 +36,31 @@ module Flatcar
       end
     end
 
+    def write_dockerfile
+
+    end
+
+    def write_compose_yaml
+
+    end
+
     def get_binding
       binding()
     end
 
+    def build
+      puts "cd #{app_path}/ && docker-compose build"
+      system("cd #{app_path}/ && docker-compose build")
+    end
+
+    private
+
+    def fs_init
+      rails_new = "rails new -B #{app_path}"
+      rails_new += " -d #{database}" unless database == 'sqlite3'
+
+      puts(rails_new)
+      system(rails_new)
+    end
   end
 end

@@ -1,21 +1,10 @@
 module Flatcar
   class Init < Base
     def execute
-      @template_model = Flatcar::TemplateModel.new(options, args)
-      @app_path = @template_model.app_path
-
-      rails_new = "rails new -B #{@app_path}"
-      rails_new += " -d #{@template_model.database}" unless @template_model.database == 'sqlite3'
-
-      puts(rails_new)
-      # system("mkdir #{@app_path}")
-      system(rails_new)
-
-      create_from_template('Dockerfile.erb', 'Dockerfile')
-      create_from_template('docker-compose.erb', 'docker-compose.yml')
-
-      puts "cd #{@app_path}/ && docker-compose build"
-      system("cd #{@app_path}/ && docker-compose build")
+      @project = Flatcar::Project.new(options, args)
+      @project.write_dockerfile
+      @project.write_compose_yaml
+      @project.build
     end
 
     private
@@ -26,7 +15,7 @@ module Flatcar
 
     def create_from_template(template_name, output_file)
       template = ERB.new(File.read("#{templates}/#{template_name}"), nil, '-')
-      result = template.result(@template_model.get_binding)
+      result = template.result(@project.get_binding)
       puts "MAKIN' THAT DOCKER THING!"
       File.open("#{@app_path}/#{output_file}", 'w') { |file| file.write(result) }
     end
