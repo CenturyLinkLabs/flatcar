@@ -24,6 +24,15 @@ command :init do |c|
          arg_name: 'DATABASE'
 
   c.action do |global_options,options,args|
-    Flatcar::Init.new(args, options).execute
+
+    unless %w(mysql postgresql sqlite3).include? options[:d]
+      help_now! 'Invalid value for --database option. Must be one of: mysql, postgresql, sqlite3'
+    end
+
+    unless %w(rails alpine ubuntu).include? options[:b]
+      help_now! 'Invalid value for --base option. Must be one of: rails, alpine, ubuntu'
+    end
+
+    @project = Flatcar::Project.init(options, args)
   end
 end
