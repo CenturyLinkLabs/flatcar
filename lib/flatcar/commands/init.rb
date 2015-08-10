@@ -23,6 +23,45 @@ command :init do |c|
          desc: 'Sets the database to use.',
          arg_name: 'DATABASE'
 
+  c.flag [:m, :template],
+         desc: 'Path to some application template (can be a filesystem path or URL)',
+         arg_name: 'TEMPLATE'
+
+  c.switch [:G, :'skip-git'],
+           desc: 'Skip .gitignore file'
+
+  c.switch [:'skip-keeps'],
+           desc: 'Skip source control .keep files'
+
+  c.switch [:O, :'skip-active-record'],
+         desc: 'Skip Active Record files'
+
+  c.switch [:V, :'skip-action-view'],
+           desc: 'Skip Action View files'
+
+  c.switch [:S, :'skip-sprockets'],
+           desc: 'Skip Sprockets files'
+
+  c.switch [:'skip-spring'],
+           desc: "Don't install Spring application preloader"
+
+  c.flag [:j, :javascript],
+         default_value: 'jquery',
+         desc: 'Preconfigure for selected JavaScript library.',
+         arg_name: 'JAVASCRIPT'
+
+  c.switch [:J, :'skip-javascript'],
+           desc: 'Skip JavaScript files'
+
+  c.switch [:T, :'skip-test-unit'],
+           desc: 'Skip Test::Unit files'
+
+  c.switch [:dev],
+           desc: 'Setup the application with Gemfile pointing to your Rails checkout'
+
+  c.switch [:edge],
+           desc: 'Setup the application with Gemfile pointing to Rails repository'
+
   c.action do |global_options,options,args|
 
     unless %w(mysql postgresql sqlite3).include? options[:d]
