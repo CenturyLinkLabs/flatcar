@@ -23,19 +23,11 @@ module Flatcar
     end
 
     def project_path
-      path = Dir.pwd
-      unless app_path == '.'
-        path = path + "/#{name}"
-      end
-      path
+      @args.empty? ? Dir.pwd : "#{Dir.pwd}/#{name}"
     end
 
     def project_name
-      if @args.empty?
-        File.basename(Dir.pwd)
-      else
-        @args[0]
-      end
+      @args.empty? ? File.basename(Dir.pwd) : @args[0]
     end
 
     def write_dockerfile
@@ -54,12 +46,11 @@ module Flatcar
       File.open("#{app_path}/docker-compose.yml", 'w') { |file| file.write(compose_yaml) }
     end
 
+    private
+
     def build
-      puts "cd #{app_path}/ && docker-compose build"
       system("cd #{app_path}/ && docker-compose build")
     end
-
-    private
 
     def fs_init
       system(rails_new)
