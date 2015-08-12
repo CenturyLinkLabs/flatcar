@@ -46,7 +46,8 @@ module Flatcar
       case @base_image
         when 'alpine'
           [
-            'FROM centurylink/alpine-rails'
+            'FROM centurylink/alpine-rails',
+            ('RUN apk --update add libpq postgresql-dev' if @database.name == 'postgresql')
           ].join("\n")
         when 'ubuntu'
           [
