@@ -1,15 +1,113 @@
 require 'spec_helper'
 
 describe Flatcar::WebappService do
-
-  describe 'initialization' do
+  describe '#dockerfile' do
+    let(:common_lines) {
+      [
+        'RUN mkdir -p /usr/src/app',
+        'WORKDIR /usr/src/app',
+        'COPY . /usr/src/app',
+        'RUN bundle install',
+        'EXPOSE 3000'
+      ]
+    }
 
     context 'when using defaults' do
-      it 'assigns a name' do
-        expect(webapp.base_image).to eql('base_image')
-        expect(webapp.database).to eql('database_of_some_sort')
+      subject { described_class.new('rails', nil) }
+
+      it 'includes the default base image instructions' do
+        expect(subject.dockerfile).to eq([
+                                           'FROM rails:latest',
+                                           'RUN apt-get update && apt-get install -y nodejs --no-install-recommends && rm -rf /var/lib/apt/lists/*',
+                                           'RUN apt-get update && apt-get install -y mysql-client postgresql-client sqlite3 --no-install-recommends && rm -rf /var/lib/apt/lists/*',
+                                         ].push(common_lines).join("\n"))
+      end
+    end
+
+    context 'when specifying the ubuntu base image' do
+      subject { described_class.new('ubuntu', nil) }
+
+      it 'includes the ubuntu base image instructions' do
+        expect(subject.dockerfile).to eq([
+                                           'FROM centurylink/ubuntu-rails'
+                                         ].push(common_lines).join("\n"))
+      end
+    end
+
+    context 'when specifying the alpine base image' do
+      context 'without a database' do
+        subject { described_class.new('alpine', nil) }
+
+        it 'includes the alpine base image instructions' do
+          expect(subject.dockerfile).to eq([
+                                             'FROM centurylink/alpine-rails',
+                                           ].push(common_lines).join("\n"))
+        end
+      end
+
+      context 'with a postgresql database' do
+        let(:postgresql) { double('postgresql_service', name: 'postgresql') }
+
+        subject { described_class.new('alpine', postgresql) }
+
+        it 'includes the alpine base image instructions with the postgres libraries' do
+          expect(subject.dockerfile).to eq([
+                                             'FROM centurylink/alpine-rails',
+                                             'RUN apk --update add libpq postgresql-dev',
+                                           ].push(common_lines).join("\n"))
+        end
       end
     end
   end
 
+  describe '#service_link' do
+    let(:db_service) { double('db_service', database_url: 'db_service_url') }
+
+    subject { described_class.new('rails', db_service) }
+
+    it 'sets the database url environment variable' do
+      expect(subject.send(:service_link)).to eq({
+                                                  'environment' => ["DATABASE_URL=db_service_url"],
+                                                  'links' => ['db:db']
+                                                })
+    end
+  end
+
+  describe '#compose_block' do
+    let(:common_lines) {
+      [
+        '---',
+        'webapp:',
+        '  build: "."',
+        '  ports:',
+        '  - 3000:3000',
+        '  volumes:',
+        '  - ".:/usr/src/app"',
+        '  working_dir: "/usr/src/app"',
+        '  command: bundle exec rails s -b \'0.0.0.0\''
+      ]
+    }
+    context 'when there is a database service' do
+      let(:db_service) { double('db_service', database_url: 'db_service_url') }
+
+      subject { described_class.new('rails', db_service) }
+
+      it 'includes the service link in the webapp compose yaml representation' do
+        expect(subject.compose_block).to eq(common_lines.push([
+                                                                '  environment:',
+                                                                '  - DATABASE_URL=db_service_url',
+                                                                '  links:',
+                                                                "  - db:db\n"
+                                                              ]).join("\n"))
+      end
+    end
+
+    context 'without a database service' do
+      subject { described_class.new('rails', nil) }
+
+      it 'returns the webapp compose yaml representation' do
+        expect(subject.compose_block).to eq(common_lines.join("\n").concat("\n"))
+      end
+    end
+  end
 end
