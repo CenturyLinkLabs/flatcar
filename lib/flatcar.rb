@@ -1,6 +1,4 @@
 require 'flatcar/version'
-require 'flatcar/base'
-require 'flatcar/init'
 require 'flatcar/models/project'
 require 'flatcar/models/service'
 require 'flatcar/models/webapp_service'
