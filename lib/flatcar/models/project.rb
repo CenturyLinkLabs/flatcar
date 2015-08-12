@@ -54,10 +54,6 @@ module Flatcar
       File.open("#{app_path}/docker-compose.yml", 'w') { |file| file.write(compose_yaml) }
     end
 
-    def get_binding
-      binding()
-    end
-
     def build
       puts "cd #{app_path}/ && docker-compose build"
       system("cd #{app_path}/ && docker-compose build")
