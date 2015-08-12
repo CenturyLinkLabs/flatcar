@@ -1,17 +1,6 @@
 module Flatcar
   class Service
 
-    def dockerfile
-      [
-        base_image_instruction,
-        'RUN mkdir -p /usr/src/app',
-        'WORKDIR /usr/src/app',
-        'COPY . /usr/src/app',
-        'RUN bundle install',
-        'EXPOSE 3000'
-      ].join("\n")
-    end
-
     def self.instance(service_type, options={})
       case service_type
       when 'postgresql'
@@ -26,6 +15,5 @@ module Flatcar
         raise("Unrecognized service type #{service_type}")
       end
     end
-
   end
 end
