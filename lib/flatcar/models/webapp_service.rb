@@ -19,7 +19,7 @@ module Flatcar
       ].join("\n")
     end
 
-    def compose_block
+    def to_h
       service_def = {
         'webapp' => {
           'build' => '.',
@@ -30,7 +30,7 @@ module Flatcar
         }
       }
       service_def['webapp'].merge!(service_link) if @database
-      service_def.to_yaml
+      service_def
     end
 
     private

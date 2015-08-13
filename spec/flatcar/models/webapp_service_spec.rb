@@ -73,32 +73,31 @@ describe Flatcar::WebappService do
     end
   end
 
-  describe '#compose_block' do
-    let(:common_lines) {
-      [
-        '---',
-        'webapp:',
-        '  build: "."',
-        '  ports:',
-        '  - 3000:3000',
-        '  volumes:',
-        '  - ".:/usr/src/app"',
-        '  working_dir: "/usr/src/app"',
-        '  command: bundle exec rails s -b \'0.0.0.0\''
-      ]
+  describe '#to_h' do
+    let(:service_hash) {
+      {
+        'webapp' => {
+          'build' => '.',
+          'ports' => ['3000:3000'],
+          'volumes' => ['.:/usr/src/app'],
+          'working_dir' => '/usr/src/app',
+          'command' => "bundle exec rails s -b '0.0.0.0'"
+        }
+      }
     }
+
     context 'when there is a database service' do
       let(:db_service) { double('db_service', database_url: 'db_service_url') }
 
       subject { described_class.new('rails', db_service) }
 
       it 'includes the service link in the webapp compose yaml representation' do
-        expect(subject.compose_block).to eq(common_lines.push([
-                                                                '  environment:',
-                                                                '  - DATABASE_URL=db_service_url',
-                                                                '  links:',
-                                                                "  - db:db\n"
-                                                              ]).join("\n"))
+
+        service_hash['webapp'].merge!(
+          'environment' => ["DATABASE_URL=#{db_service.database_url}"],
+          'links' => ['db:db']
+        )
+        expect(subject.to_h).to eql(service_hash)
       end
     end
 
@@ -106,7 +105,7 @@ describe Flatcar::WebappService do
       subject { described_class.new('rails', nil) }
 
       it 'returns the webapp compose yaml representation' do
-        expect(subject.compose_block).to eq(common_lines.join("\n").concat("\n"))
+        expect(subject.to_h).to eq(service_hash)
       end
     end
   end

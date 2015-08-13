@@ -3,7 +3,8 @@ require 'spec_helper'
 describe Flatcar::Project do
   let(:default_options) { { b: 'rails', d: 'sqlite3' } }
   let(:args) { [ 'app_name' ] }
-  let(:webapp) { double('webapp_service', dockerfile: 'FROM foo', compose_block: 'webapp_service') }
+  let(:service_hash) { { 'foo' => 'bar' } }
+  let(:webapp) { double('webapp_service', dockerfile: 'FROM foo', to_h: service_hash) }
 
   before do
     allow_any_instance_of(Flatcar::Project).to receive(:system)
@@ -353,7 +354,8 @@ describe Flatcar::Project do
     end
 
     context 'when there is a database service' do
-      let(:database) { double('database_service', name: 'postgresql', compose_block: "db_service") }
+      let(:db_service_hash) { { 'bar' => 'baz' } }
+      let(:database) { double('database_service', name: 'postgresql', to_h: db_service_hash) }
 
       before do
         allow(Flatcar::Service).to receive(:instance).with('postgresql').and_return(database)
@@ -369,7 +371,7 @@ describe Flatcar::Project do
       end
 
       it 'writes the compose representation for all services' do
-        expect(io).to receive(:write).with("webapp_service\ndb_service")
+        expect(io).to receive(:write).with("---\nfoo: bar\nbar: baz\n")
         subject.write_compose_yaml
       end
     end
@@ -389,7 +391,7 @@ describe Flatcar::Project do
       end
 
       it 'writes the compose representation for the webapp' do
-        expect(io).to receive(:write).with("webapp_service\n")
+        expect(io).to receive(:write).with("---\nfoo: bar\n")
         subject.write_compose_yaml
       end
     end

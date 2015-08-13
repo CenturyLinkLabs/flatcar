@@ -6,9 +6,6 @@ describe Flatcar::Service do
   let(:mysql_database) { double('mysql_service', name: 'mysql') }
   let(:webapp) { double('webapp_service', name: 'webapp') }
 
-  before do
-  end
-
   describe('.instance') do
     context 'when the service type is webapp' do
       it 'attempts to instantiate a webapp service' do

@@ -38,19 +38,18 @@ module Flatcar
     end
 
     def write_compose_yaml
-      compose_yaml =
-        [
-          @webapp.compose_block,
-          (@database.compose_block if @database)
-        ].join("\n")
+
+      project_compose_block = @database ? @webapp.to_h.merge(@database.to_h) : @webapp.to_h
+      compose_yaml = project_compose_block.to_yaml
+
       File.open("#{app_path}/docker-compose.yml", 'w') { |file| file.write(compose_yaml) }
     end
-
-    private
 
     def build
       system("cd #{app_path}/ && docker-compose build")
     end
+
+    private
 
     def fs_init
       system(rails_new)
