@@ -30,8 +30,7 @@ describe Flatcar::Service do
 
     context 'when the service type is invalid' do
       it 'raises an exception' do
-        expect(Flatcar::Service).to receive(:instance).with('foobar').and_return(Exception.new)
-        Flatcar::Service.instance('foobar')
+        expect{Flatcar::Service.instance('foobar')}.to raise_error("Unrecognized service type foobar")
       end
     end
   end
