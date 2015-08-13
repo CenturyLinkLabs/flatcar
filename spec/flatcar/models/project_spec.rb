@@ -1,18 +1,45 @@
 require 'spec_helper'
 
 describe Flatcar::Project do
+  let(:default_options) { { b: 'rails', d: 'sqlite3' } }
   let(:args) { [ 'app_name' ] }
-  let(:webapp) { double('webapp_service') }
+  let(:webapp) { double('webapp_service', dockerfile: 'FROM foo', compose_block: 'webapp_service') }
 
   before do
     allow_any_instance_of(Flatcar::Project).to receive(:system)
   end
 
+  describe '.init' do
+    let(:project) { double("project", write_dockerfile: true, write_compose_yaml: true, build: true) }
+
+    before do
+      allow(Flatcar::Project).to receive(:new).and_return(project)
+    end
+
+    after do
+      described_class.init(default_options, args)
+    end
+
+    it 'instantiates a new Project' do
+      expect(Flatcar::Project).to receive(:new).with(default_options, args)
+    end
+
+    it 'writes the dockerfile' do
+      expect(project).to receive(:write_dockerfile)
+    end
+
+    it 'writes the docker-compose.yml' do
+      expect(project).to receive(:write_compose_yaml)
+    end
+
+    it 'calls docker-compose build' do
+      expect(project).to receive(:build)
+    end
+  end
+
   describe 'initialization' do
 
     context 'when using defaults' do
-      let(:options) { { b: 'rails', d: 'sqlite3' } }
-
       before do
         allow(Flatcar::Service).to receive(:instance).with('sqlite3')
         allow(Flatcar::Service).to receive(:instance).with('webapp', base_image: 'rails', database: nil)
@@ -20,7 +47,7 @@ describe Flatcar::Project do
 
       it 'calls Rails new with the -B flag and the app_name' do
         expect_any_instance_of(Flatcar::Project).to receive(:system).with('rails new -B app_name')
-        Flatcar::Project.new(options, args)
+        Flatcar::Project.new(default_options, args)
       end
     end
 
@@ -222,6 +249,173 @@ describe Flatcar::Project do
             .to receive(:system).with('rails new -B app_name --skip-javascript --template=foo')
           Flatcar::Project.new(options, args)
         end
+      end
+    end
+  end
+
+  describe '#app_path' do
+    before do
+      allow(Flatcar::Service).to receive(:instance).with('sqlite3')
+      allow(Flatcar::Service).to receive(:instance).with('webapp', base_image: 'rails', database: nil)
+    end
+
+    context 'if no path is given' do
+      subject { Flatcar::Project.new(default_options, []) }
+
+      it 'returns . if no path is given' do
+        expect(subject.app_path).to eq '.'
+      end
+    end
+
+    context 'when a path is given to .initialize' do
+      subject { Flatcar::Project.new(default_options, args) }
+
+      it 'returns the path' do
+        expect(subject.app_path).to eq 'app_name'
+      end
+    end
+  end
+
+  describe '#project_path' do
+    before do
+      allow(Flatcar::Service).to receive(:instance).with('sqlite3')
+      allow(Flatcar::Service).to receive(:instance).with('webapp', base_image: 'rails', database: nil)
+    end
+
+    context 'if no path is given' do
+      subject { Flatcar::Project.new(default_options, []) }
+
+      it 'returns the current working directory' do
+        expect(subject.project_path).to eq Dir.pwd
+      end
+    end
+
+    context 'when a path is given' do
+      subject { Flatcar::Project.new(default_options, args) }
+
+      it 'returns the current working directory with the path appended' do
+        expect(subject.project_path).to eq "#{Dir.pwd}/app_name"
+      end
+    end
+  end
+
+  describe '#project_name' do
+    before do
+      allow(Flatcar::Service).to receive(:instance).with('sqlite3')
+      allow(Flatcar::Service).to receive(:instance).with('webapp', base_image: 'rails', database: nil)
+    end
+
+    context 'if no path is given' do
+      subject { Flatcar::Project.new(default_options, []) }
+
+      it 'returns the basename of the current working directory' do
+        expect(subject.project_name).to eq File.basename(Dir.pwd)
+      end
+    end
+
+    context 'when a path is given' do
+      subject { Flatcar::Project.new(default_options, args) }
+
+      it 'returns the path' do
+        expect(subject.project_name).to eq 'app_name'
+      end
+    end
+  end
+
+  describe '#write_dockerfile' do
+    let(:io) { StringIO.new }
+
+    before do
+      allow(Flatcar::Service).to receive(:instance).with('sqlite3')
+      allow(Flatcar::Service)
+        .to receive(:instance).with('webapp', base_image: 'rails', database: nil).and_return(webapp)
+      allow(File).to receive(:open).and_yield(io)
+    end
+
+    subject { Flatcar::Project.new(default_options, []) }
+
+    it 'writes to the Dockerfile in the app path' do
+      expect(File).to receive(:open).with('./Dockerfile', 'w')
+      subject.write_dockerfile
+    end
+
+    it 'writes the webapp dockerfile representation' do
+      expect(io).to receive(:write).with(webapp.dockerfile)
+      subject.write_dockerfile
+    end
+  end
+
+  describe '#write_compose_yaml' do
+    let(:io) { StringIO.new }
+
+    before do
+      allow(File).to receive(:open).and_yield(io)
+    end
+
+    context 'when there is a database service' do
+      let(:database) { double('database_service', name: 'postgresql', compose_block: "db_service") }
+
+      before do
+        allow(Flatcar::Service).to receive(:instance).with('postgresql').and_return(database)
+        allow(Flatcar::Service)
+          .to receive(:instance).with('webapp', base_image: 'rails', database: database).and_return(webapp)
+      end
+
+      subject { Flatcar::Project.new({ b: 'rails', d: 'postgresql' }, []) }
+
+      it 'writes to the docker-compose.yml file in the app path' do
+        expect(File).to receive(:open).with('./docker-compose.yml', 'w')
+        subject.write_compose_yaml
+      end
+
+      it 'writes the compose representation for all services' do
+        expect(io).to receive(:write).with("webapp_service\ndb_service")
+        subject.write_compose_yaml
+      end
+    end
+
+    context 'without a database service' do
+      before do
+        allow(Flatcar::Service).to receive(:instance).with('sqlite3')
+        allow(Flatcar::Service)
+          .to receive(:instance).with('webapp', base_image: 'rails', database: nil).and_return(webapp)
+      end
+
+      subject { Flatcar::Project.new(default_options, []) }
+
+      it 'writes to the docker-compose.yml file in the app path' do
+        expect(File).to receive(:open).with('./docker-compose.yml', 'w')
+        subject.write_compose_yaml
+      end
+
+      it 'writes the compose representation for the webapp' do
+        expect(io).to receive(:write).with("webapp_service\n")
+        subject.write_compose_yaml
+      end
+    end
+  end
+
+  describe '#build' do
+    before do
+      allow(Flatcar::Service).to receive(:instance).with('sqlite3')
+      allow(Flatcar::Service).to receive(:instance).with('webapp', base_image: 'rails', database: nil)
+    end
+
+    context 'if no path is given' do
+      subject { Flatcar::Project.new(default_options, []) }
+
+      it 'calls docker-compose build in the current directory' do
+        expect(subject).to receive(:system).with("cd ./ && docker-compose build")
+        subject.send(:build)
+      end
+    end
+
+    context 'when a path is given' do
+      subject { Flatcar::Project.new(default_options, args) }
+
+      it 'calls docker-compose build in the app path' do
+        expect(subject).to receive(:system).with("cd app_name/ && docker-compose build")
+        subject.send(:build)
       end
     end
   end
