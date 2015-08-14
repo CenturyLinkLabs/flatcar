@@ -31,8 +31,6 @@ module Flatcar
     end
 
     def write_dockerfile
-      puts "MAKIN' THAT DOCKER THING!"
-
       dockerfile = @webapp.dockerfile
       File.open("#{app_path}/Dockerfile", 'w') { |file| file.write(dockerfile) }
     end
