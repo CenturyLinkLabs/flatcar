@@ -9,6 +9,10 @@ module Flatcar
       project.build
     end
 
+    def self.package(options, args)
+      puts 'packaging this thing up'
+    end
+
     def initialize(options, args)
       @args = args
       @name = project_name
