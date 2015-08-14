@@ -3,9 +3,10 @@
 Developing Rails applications with Docker is easy with Flatcar. Using native Docker commands, Flatcar will build
 your application and link it to whatever database you choose to use.
 
-##Installation
-`gem install flatcar` and you're ready to go.
+##Installation and Dependencies
+Flatcar depends on [Docker](https://www.docker.com). You must have Docker and Docker Compose installed on your machine in order for Flatcar to work. If you are on Linux, [install Docker](http://docs.docker.com/linux/step_one/) with official packages. On a [Mac](http://docs.docker.com/mac/started/) or [Windows](http://docs.docker.com/windows/started/), you will need to run a lightweight VM in order to use Docker.
 
+Then, `gem install flatcar` and you're ready to get rolling.
 
 ##Usage
 *creating a new Rails project*
