@@ -4,7 +4,7 @@ Developing Rails applications with Docker is easy with Flatcar. Using native Doc
 your application and link it to whatever database you choose to use.
 
 ##Installation and Dependencies
-Flatcar depends on [Docker](https://www.docker.com). You must have Docker and Docker Compose installed on your machine in order for Flatcar to work. If you are on Linux, [install Docker](http://docs.docker.com/linux/step_one/) with official packages. On a [Mac](http://docs.docker.com/mac/started/) or [Windows](http://docs.docker.com/windows/started/), you will need to run a lightweight VM in order to use Docker.
+Flatcar depends on [Docker](https://www.docker.com). You must have Docker and Docker Compose installed on your machine in order for Flatcar to work. If you are on Linux, [install Docker](http://docs.docker.com/linux/step_one/) with official packages. On a [Mac](http://docs.docker.com/mac/started/) or [Windows](http://docs.docker.com/windows/started/), you will need to run a lightweight VM in order to use Docker. You can do this via [Docker Toolbox](https://www.docker.com/toolbox) or by running a VM of your choice.
 
 Then, `gem install flatcar` and you're ready to get rolling.
 
@@ -20,6 +20,8 @@ Run `flatcar init $path_to_project` to begin a new project. You can initialize a
 1. If no project path is specified, it runs `rails new -B $app_path`. 
 2. Flatcar generates a Dockerfile for the Rails service
 3. A docker-compose.yml file is generated for the entire project.
+
+Flatcar applications are run via `docker-compose` in the project's directory. If you're using a VM, make sure to create appropriate port forwarding rules in order to view the application in your browser. Flatcar will bind 3000:3000 from host:container via Docker's `-p` flag at runtime.
 
 To run the application, cd into the project directory and run `docker-compose up`.
 
