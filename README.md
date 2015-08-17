@@ -9,12 +9,14 @@ Flatcar depends on [Docker](https://www.docker.com). You must have Docker and Do
 Then, `gem install flatcar` and you're ready to get rolling.
 
 ##Usage
-*creating a new Rails project*
+####Creating a new Rails project
+From the desired parent directory, run `flatcar init $new_project_name`. This will initialize a new Rails application in a directory of the same name. 
 
-*with an existing Rails project*
-`flatcar init $path_to_project` to begin a new project. You can initialize a flatcar project from the current directory by simply running `flatcar init`.
+####Using an existing Rails project
+Run `flatcar init $path_to_project` to begin a new project. You can initialize a flatcar project from the current directory by simply running `flatcar init`.
 
-`flatcar init $` does three things.
+`flatcar init ($new_project_name|$path_to_project)` will perform the following operations:
+
 1. If no project path is specified, it runs `rails new -B $app_path`. 
 2. Flatcar generates a Dockerfile for the Rails service
 3. A docker-compose.yml file is generated for the entire project.
@@ -56,3 +58,8 @@ Flatcar uses rspec. To run the test suite, run `bundle exec rspec spec`.
 
 ##Contributing
 Flatcar uses an Apache License and your contributions are welcome.
+First, `git clone https://github.com/CenturyLinkLabs/flatcar.git`.
+Flarcar uses GLI, which is a very useful tool for writing command line tools. More information on GLI can be found on [the project page](http://naildrivin5.com/gli/) as well as the [GitHub repo](https://github.com/davetron5000/gli).
+To run flatcar in development mode, we recommend passing in GLI_DEBUG=true to your run command.  
+
+
