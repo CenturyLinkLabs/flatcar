@@ -45,14 +45,9 @@ module Flatcar
     def base_image_instruction
       case @base_image
       when 'alpine'
-        if @database && @database.name == 'postgresql'
-          [
-            'FROM centurylink/alpine-rails',
-            'RUN apk --update add libpq postgresql-dev'
-          ].join("\n")
-        else
-          'FROM centurylink/alpine-rails'
-        end
+        instruction = ['FROM centurylink/alpine-rails']
+        instruction << alpine_database_packages if @database
+        instruction.join("\n")
       when 'ubuntu'
         [
           'FROM centurylink/ubuntu-rails'
@@ -63,6 +58,17 @@ module Flatcar
           'RUN apt-get update && apt-get install -y nodejs --no-install-recommends && rm -rf /var/lib/apt/lists/*',
           'RUN apt-get update && apt-get install -y mysql-client postgresql-client sqlite3 --no-install-recommends && rm -rf /var/lib/apt/lists/*'
         ].join("\n")
+      end
+    end
+
+    def alpine_database_packages
+      case @database.name
+      when 'postgresql'
+        'RUN apk --update add libpq postgresql-dev'
+      when 'mysql'
+        'RUN apk --update add mysql-dev'
+      else
+        return
       end
     end
   end

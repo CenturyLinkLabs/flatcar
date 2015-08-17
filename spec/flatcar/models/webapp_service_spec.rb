@@ -57,6 +57,19 @@ describe Flatcar::WebappService do
                                            ].push(common_lines).join("\n"))
         end
       end
+
+      context 'with a mysql database' do
+        let(:mysql) { double('mysql_service', name: 'mysql') }
+
+        subject { described_class.new('alpine', mysql) }
+
+        it 'includes the alpine base image instructions with the mysql libraries' do
+          expect(subject.dockerfile).to eq([
+                                             'FROM centurylink/alpine-rails',
+                                             'RUN apk --update add mysql-dev',
+                                           ].push(common_lines).join("\n"))
+        end
+      end
     end
   end
 
