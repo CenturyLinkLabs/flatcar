@@ -6,10 +6,10 @@ module Flatcar
       project = new(options, args)
       project.write_dockerfile
       project.write_compose_yaml
-      project.build
+      project.docker_build
     end
 
-    def self.package(options, args)
+    def self.build(options, args)
       puts 'packaging this thing up'
     end
 
@@ -47,7 +47,7 @@ module Flatcar
       File.open("#{app_path}/docker-compose.yml", 'w') { |file| file.write(compose_yaml) }
     end
 
-    def build
+    def docker_build
       system("cd #{app_path}/ && docker-compose build")
     end
 

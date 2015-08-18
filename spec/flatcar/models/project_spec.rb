@@ -11,7 +11,7 @@ describe Flatcar::Project do
   end
 
   describe '.init' do
-    let(:project) { double("project", write_dockerfile: true, write_compose_yaml: true, build: true) }
+    let(:project) { double('project', write_dockerfile: true, write_compose_yaml: true, docker_build: true) }
 
     before do
       allow(Flatcar::Project).to receive(:new).and_return(project)
@@ -34,7 +34,7 @@ describe Flatcar::Project do
     end
 
     it 'calls docker-compose build' do
-      expect(project).to receive(:build)
+      expect(project).to receive(:docker_build)
     end
   end
 
@@ -397,7 +397,7 @@ describe Flatcar::Project do
     end
   end
 
-  describe '#build' do
+  describe '#docker_build' do
     before do
       allow(Flatcar::Service).to receive(:instance).with('sqlite3')
       allow(Flatcar::Service).to receive(:instance).with('webapp', base_image: 'rails', database: nil)
@@ -408,7 +408,7 @@ describe Flatcar::Project do
 
       it 'calls docker-compose build in the current directory' do
         expect(subject).to receive(:system).with("cd ./ && docker-compose build")
-        subject.send(:build)
+        subject.send(:docker_build)
       end
     end
 
@@ -417,7 +417,7 @@ describe Flatcar::Project do
 
       it 'calls docker-compose build in the app path' do
         expect(subject).to receive(:system).with("cd app_name/ && docker-compose build")
-        subject.send(:build)
+        subject.send(:docker_build)
       end
     end
   end
