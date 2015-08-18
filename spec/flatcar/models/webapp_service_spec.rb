@@ -52,8 +52,7 @@ describe Flatcar::WebappService do
 
         it 'includes the alpine base image instructions with the postgres libraries' do
           expect(subject.dockerfile).to eq([
-                                             'FROM centurylink/alpine-rails',
-                                             'RUN apk --update add libpq postgresql-dev',
+                                             'FROM centurylink/alpine-rails'
                                            ].push(common_lines).join("\n"))
         end
       end
@@ -65,8 +64,7 @@ describe Flatcar::WebappService do
 
         it 'includes the alpine base image instructions with the mysql libraries' do
           expect(subject.dockerfile).to eq([
-                                             'FROM centurylink/alpine-rails',
-                                             'RUN apk --update add mysql-dev',
+                                             'FROM centurylink/alpine-rails'
                                            ].push(common_lines).join("\n"))
         end
       end
