@@ -4,13 +4,15 @@ module Flatcar
 
     def self.init(options, args)
       project = new(options, args)
+      project.fs_init
       project.write_dockerfile
       project.write_compose_yaml
       project.docker_build
     end
 
     def self.build(options, args)
-      puts 'packaging this thing up'
+      project = new(options, args)
+      project.write_dockerfile(for_production: true)
     end
 
     def initialize(options, args)
@@ -19,7 +21,6 @@ module Flatcar
       @database = Flatcar::Service.instance(options.delete(:d))
       @webapp = Flatcar::Service.instance('webapp', base_image: options.delete(:b), database: @database)
       @options = options
-      fs_init
     end
 
     def app_path
@@ -34,9 +35,15 @@ module Flatcar
       @args.empty? ? File.basename(Dir.pwd) : @args[0]
     end
 
-    def write_dockerfile
+    def write_dockerfile(for_production: false)
       dockerfile = @webapp.dockerfile
-      File.open("#{app_path}/Dockerfile", 'w') { |file| file.write(dockerfile) }
+      if for_production
+        dockerfile << "\nENV RAILS_ENV=production"
+        dockerfile << "\nCMD bundle --without developer test && rake db:create && rake db:migrate &&  rake db:seed && rails s"
+        File.open("#{app_path}/Dockerfile-pro", 'w') { |file| file.write(dockerfile) }
+      else
+        File.open("#{app_path}/Dockerfile", 'w') { |file| file.write(dockerfile) }
+      end
     end
 
     def write_compose_yaml
@@ -51,11 +58,11 @@ module Flatcar
       system("cd #{app_path}/ && docker-compose build")
     end
 
-    private
-
     def fs_init
       system(rails_new)
     end
+
+    private
 
     def rails_new
       rails_new = "rails new -B #{app_path}"

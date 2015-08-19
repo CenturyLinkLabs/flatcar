@@ -11,7 +11,7 @@ describe Flatcar::Project do
   end
 
   describe '.init' do
-    let(:project) { double('project', write_dockerfile: true, write_compose_yaml: true, docker_build: true) }
+    let(:project) { double('project', write_dockerfile: true, write_compose_yaml: true, docker_build: true, fs_init: true) }
 
     before do
       allow(Flatcar::Project).to receive(:new).and_return(project)
@@ -38,7 +38,7 @@ describe Flatcar::Project do
     end
   end
 
-  describe 'initialization' do
+  describe '#fs_init' do
 
     context 'when using defaults' do
       before do
@@ -48,7 +48,8 @@ describe Flatcar::Project do
 
       it 'calls Rails new with the -B flag and the app_name' do
         expect_any_instance_of(Flatcar::Project).to receive(:system).with('rails new -B app_name')
-        Flatcar::Project.new(default_options, args)
+        project = Flatcar::Project.new(default_options, args)
+        project.fs_init
       end
     end
 
@@ -61,33 +62,10 @@ describe Flatcar::Project do
         allow(Flatcar::Service).to receive(:instance).with('webapp', base_image: 'rails', database: database)
       end
 
-      it 'instantiates the postgres database service' do
-        expect(Flatcar::Service).to receive(:instance).with('postgresql').and_return(database)
-        Flatcar::Project.new(options, args)
-      end
-
       it 'calls Rails new with the -d option' do
         expect_any_instance_of(Flatcar::Project).to receive(:system).with('rails new -B app_name -d postgresql')
-        Flatcar::Project.new(options, args)
-      end
-    end
-
-    context 'when specifying a base image other than rails' do
-      let(:options) { { b: 'alpine', d: 'sqlite3' } }
-
-      before do
-        allow(Flatcar::Service).to receive(:instance).with('sqlite3')
-        allow(Flatcar::Service).to receive(:instance).with('webapp', base_image: 'alpine', database: nil)
-      end
-
-      it 'instantiates the webapp service with the base image' do
-        expect(Flatcar::Service).to receive(:instance).with('webapp', base_image: 'alpine', database: nil)
-        Flatcar::Project.new(options, args)
-      end
-
-      it 'calls Rails new with the -B flag and the app_name' do
-        expect_any_instance_of(Flatcar::Project).to receive(:system).with('rails new -B app_name')
-        Flatcar::Project.new(options, args)
+        project = Flatcar::Project.new(options, args)
+        project.fs_init
       end
     end
 
@@ -97,6 +75,11 @@ describe Flatcar::Project do
         allow(Flatcar::Service).to receive(:instance).with('webapp', base_image: 'rails', database: nil)
       end
 
+      after do
+        project = Flatcar::Project.new(options, args)
+        project.fs_init
+      end
+
       context '--skip-git' do
         let(:options) do
           { b: 'rails', d: 'sqlite3', G: true, 'G' => true, 'skip-git' => true, :'skip-git' => true}
@@ -104,7 +87,6 @@ describe Flatcar::Project do
 
         it 'calls Rails new with the --skip-git flag' do
           expect_any_instance_of(Flatcar::Project).to receive(:system).with('rails new -B app_name --skip-git')
-          Flatcar::Project.new(options, args)
         end
       end
 
@@ -115,7 +97,6 @@ describe Flatcar::Project do
 
         it 'calls Rails new with the --skip-keeps flag' do
           expect_any_instance_of(Flatcar::Project).to receive(:system).with('rails new -B app_name --skip-keeps')
-          Flatcar::Project.new(options, args)
         end
       end
 
@@ -126,7 +107,6 @@ describe Flatcar::Project do
 
         it 'calls Rails new with the --skip-active-record flag' do
           expect_any_instance_of(Flatcar::Project).to receive(:system).with('rails new -B app_name --skip-active-record')
-          Flatcar::Project.new(options, args)
         end
       end
 
@@ -137,7 +117,6 @@ describe Flatcar::Project do
 
         it 'calls Rails new with the --skip-action-view flag' do
           expect_any_instance_of(Flatcar::Project).to receive(:system).with('rails new -B app_name --skip-action-view')
-          Flatcar::Project.new(options, args)
         end
       end
 
@@ -148,7 +127,6 @@ describe Flatcar::Project do
 
         it 'calls Rails new with the --skip-sprockets flag' do
           expect_any_instance_of(Flatcar::Project).to receive(:system).with('rails new -B app_name --skip-sprockets')
-          Flatcar::Project.new(options, args)
         end
       end
 
@@ -159,7 +137,6 @@ describe Flatcar::Project do
 
         it 'calls Rails new with the --skip-spring flag' do
           expect_any_instance_of(Flatcar::Project).to receive(:system).with('rails new -B app_name --skip-spring')
-          Flatcar::Project.new(options, args)
         end
       end
 
@@ -170,7 +147,6 @@ describe Flatcar::Project do
 
         it 'calls Rails new with the --skip-test-unit flag' do
           expect_any_instance_of(Flatcar::Project).to receive(:system).with('rails new -B app_name --skip-test-unit')
-          Flatcar::Project.new(options, args)
         end
       end
 
@@ -181,7 +157,6 @@ describe Flatcar::Project do
 
         it 'calls Rails new with the --skip-javascript flag' do
           expect_any_instance_of(Flatcar::Project).to receive(:system).with('rails new -B app_name --skip-javascript')
-          Flatcar::Project.new(options, args)
         end
       end
 
@@ -192,7 +167,6 @@ describe Flatcar::Project do
 
         it 'calls Rails new with the --dev flag' do
           expect_any_instance_of(Flatcar::Project).to receive(:system).with('rails new -B app_name --dev')
-          Flatcar::Project.new(options, args)
         end
       end
 
@@ -203,7 +177,6 @@ describe Flatcar::Project do
 
         it 'calls Rails new with the --edge flag' do
           expect_any_instance_of(Flatcar::Project).to receive(:system).with('rails new -B app_name --edge')
-          Flatcar::Project.new(options, args)
         end
       end
 
@@ -214,7 +187,6 @@ describe Flatcar::Project do
 
         it 'calls Rails new with the --javascript flag' do
           expect_any_instance_of(Flatcar::Project).to receive(:system).with('rails new -B app_name --javascript=react')
-          Flatcar::Project.new(options, args)
         end
       end
 
@@ -225,7 +197,6 @@ describe Flatcar::Project do
 
         it 'calls Rails new with the --template flag' do
           expect_any_instance_of(Flatcar::Project).to receive(:system).with('rails new -B app_name --template=foo')
-          Flatcar::Project.new(options, args)
         end
       end
 
@@ -248,8 +219,38 @@ describe Flatcar::Project do
         it 'calls Rails new with each option' do
           expect_any_instance_of(Flatcar::Project)
             .to receive(:system).with('rails new -B app_name --skip-javascript --template=foo')
-          Flatcar::Project.new(options, args)
         end
+      end
+    end
+  end
+
+  describe 'initialization' do
+    context 'when specifying a database other than sqlite3' do
+      let(:options) { { b: 'rails', d: 'postgresql' } }
+      let(:database) { double('database_service', name: 'postgresql') }
+
+      before do
+        allow(Flatcar::Service).to receive(:instance).with('postgresql').and_return(database)
+        allow(Flatcar::Service).to receive(:instance).with('webapp', base_image: 'rails', database: database)
+      end
+
+      it 'instantiates the postgres database service' do
+        expect(Flatcar::Service).to receive(:instance).with('postgresql').and_return(database)
+        Flatcar::Project.new(options, args)
+      end
+    end
+
+    context 'when specifying a base image other than rails' do
+      let(:options) { { b: 'alpine', d: 'sqlite3' } }
+
+      before do
+        allow(Flatcar::Service).to receive(:instance).with('sqlite3')
+        allow(Flatcar::Service).to receive(:instance).with('webapp', base_image: 'alpine', database: nil)
+      end
+
+      it 'instantiates the webapp service with the base image' do
+        expect(Flatcar::Service).to receive(:instance).with('webapp', base_image: 'alpine', database: nil)
+        Flatcar::Project.new(options, args)
       end
     end
   end
