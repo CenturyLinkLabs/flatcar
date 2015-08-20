@@ -10,10 +10,6 @@ module Flatcar
       project.docker_build
     end
 
-    def self.build(options, args)
-
-    end
-
     def initialize(options, args)
       @args = args
       @name = project_name
