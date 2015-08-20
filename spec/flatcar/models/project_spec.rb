@@ -341,8 +341,8 @@ describe Flatcar::Project do
       subject.write_dockerfile
     end
 
-    it 'writes the webapp dockerfile representation' do
-      expect(io).to receive(:write).with(webapp.dockerfile)
+    it 'writes the webapp dockerfile representations' do
+      expect(io).to receive(:write).with(webapp.dockerfile).twice
       subject.write_dockerfile
     end
   end

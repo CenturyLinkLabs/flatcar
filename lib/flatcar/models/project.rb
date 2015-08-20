@@ -11,8 +11,7 @@ module Flatcar
     end
 
     def self.build(options, args)
-      project = new(options, args)
-      project.write_dockerfile(for_production: true)
+
     end
 
     def initialize(options, args)
@@ -35,15 +34,12 @@ module Flatcar
       @args.empty? ? File.basename(Dir.pwd) : @args[0]
     end
 
-    def write_dockerfile(for_production: false)
+    def write_dockerfile
       dockerfile = @webapp.dockerfile
-      if for_production
-        dockerfile << "\nENV RAILS_ENV=production"
-        dockerfile << "\nCMD bundle --without developer test && rake db:create && rake db:migrate &&  rake db:seed && rails s"
-        File.open("#{app_path}/Dockerfile-pro", 'w') { |file| file.write(dockerfile) }
-      else
-        File.open("#{app_path}/Dockerfile", 'w') { |file| file.write(dockerfile) }
-      end
+      File.open("#{app_path}/Dockerfile", 'w') { |file| file.write(dockerfile) }
+      dockerfile << "\nENV RAILS_ENV=production"
+      dockerfile << "\nCMD bundle --without developer test && rake db:create && rake db:migrate && rake db:seed && rails s -b '0.0.0.0'"
+      File.open("#{app_path}/Dockerfile-pro", 'w') { |file| file.write(dockerfile) }
     end
 
     def write_compose_yaml
