@@ -52,6 +52,10 @@ module Flatcar
         [
           'FROM centurylink/ubuntu-rails'
         ].join("\n")
+      when 'debian'
+        [
+          'FROM centurylink/debian-rails'
+        ].join("\n")
       else
         [
           'FROM rails:latest',

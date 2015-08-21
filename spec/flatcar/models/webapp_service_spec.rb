@@ -34,6 +34,16 @@ describe Flatcar::WebappService do
       end
     end
 
+    context 'when specifying the debian base image' do
+      subject { described_class.new('debian', nil) }
+
+      it 'includes the debian base image instructions' do
+        expect(subject.dockerfile).to eq([
+                                           'FROM centurylink/debian-rails'
+                                         ].push(common_lines).join("\n"))
+      end
+    end
+
     context 'when specifying the alpine base image' do
       context 'without a database' do
         subject { described_class.new('alpine', nil) }

@@ -16,7 +16,7 @@ command :init do |c|
   c.flag [:b, :base],
          default_value: 'rails',
          desc: 'Sets the base image to use in the Dockerfile',
-         must_match: %w(rails alpine ubuntu),
+         must_match: %w(rails alpine ubuntu debian),
          arg_name: 'BASE_IMAGE'
 
   c.flag [:d, :database],
