@@ -3,7 +3,8 @@ require File.join([File.dirname(__FILE__),'lib','flatcar','version.rb'])
 Gem::Specification.new do |gem|
   gem.authors = %w(CenturyLink)
   gem.email = %w(ctl-labs-futuretech@ctl.io)
-  gem.description = 'A CLI for Ruby on Rails web applications to be deployed as containerized Docker services'
+  gem.description = 'Flatcar is a command line tool to simplify the development of Ruby on Rails web applications that
+                     are intended to be deployed and run in production as containerized Docker microservices.'
   gem.summary = 'A CLI for Ruby on Rails web applications to be deployed as containerized Docker services'
   gem.homepage = 'https://github.com/centurylinklabs/flatcar'
   gem.license = 'Apache 2'
@@ -19,11 +20,11 @@ Gem::Specification.new do |gem|
   gem.rdoc_options << '--title' << 'flatcar' << '--main' << 'README.md' << '-ri'
   gem.bindir = 'bin'
   gem.required_ruby_version = '>= 2.2.2'
+  gem.add_dependency 'gli', '2.13.1'
   gem.add_dependency 'rails', '~> 4.2'
-  gem.add_development_dependency('rake')
+  gem.add_development_dependency 'rake', '~> 10.4'
   gem.add_development_dependency 'rspec', '~> 3.3'
   gem.add_development_dependency 'simplecov', '~> 0.10.0'
   gem.add_development_dependency 'simplecov-rcov', '~> 0.2.3'
-  gem.add_development_dependency('rdoc')
-  gem.add_runtime_dependency('gli','2.13.1')
+  gem.add_development_dependency 'rdoc', '~> 4.2'
 end

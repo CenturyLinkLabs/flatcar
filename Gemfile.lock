@@ -127,8 +127,11 @@ PLATFORMS
 
 DEPENDENCIES
   flatcar!
-  rake
-  rdoc
+  rake (~> 10.4)
+  rdoc (~> 4.2)
   rspec (~> 3.3)
   simplecov (~> 0.10.0)
   simplecov-rcov (~> 0.2.3)
+
+BUNDLED WITH
+   1.10.6
