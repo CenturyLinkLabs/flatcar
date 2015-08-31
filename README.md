@@ -23,7 +23,7 @@ Run `flatcar init $path_to_project` to begin a new project. You can initialize a
 
 Flatcar applications are run via `docker-compose` in the project's directory. If you're using a VM, make sure to create appropriate port forwarding rules in order to view the application in your browser. Flatcar will bind 3000:3000 from host:container via Docker's `-p` flag at runtime.
 
-To run the application, cd into the project directory and run `docker-compose up`.
+To run the application, cd into the project directory and run `docker-compose up`. To run the services in the background, use the `-d` flag.
 
 ####init
 Flatcar uses the following syntax: `flatcar [global options] init [command options] [APP_NAME]`
