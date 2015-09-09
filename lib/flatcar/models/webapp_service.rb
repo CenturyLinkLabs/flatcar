@@ -43,25 +43,14 @@ module Flatcar
     end
 
     def base_image_instruction
-      case @base_image
-      when 'alpine'
-        [
-          'FROM flatcar/alpine-rails'
-        ].join("\n")
-      when 'ubuntu'
-        [
-          'FROM flatcar/ubuntu-rails'
-        ].join("\n")
-      when 'debian'
-        [
-          'FROM flatcar/debian-rails'
-        ].join("\n")
-      else
+      if @base_image == 'rails'
         [
           'FROM rails:latest',
           'RUN apt-get update && apt-get install -y nodejs --no-install-recommends && rm -rf /var/lib/apt/lists/*',
           'RUN apt-get update && apt-get install -y mysql-client postgresql-client sqlite3 --no-install-recommends && rm -rf /var/lib/apt/lists/*'
         ].join("\n")
+      else
+        "FROM flatcar/#{@base_image}-rails"
       end
     end
   end

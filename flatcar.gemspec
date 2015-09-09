@@ -1,12 +1,12 @@
 require File.join([File.dirname(__FILE__),'lib','flatcar','version.rb'])
 
 Gem::Specification.new do |gem|
-  gem.authors = %w(CenturyLink)
-  gem.email = %w(ctl-labs-futuretech@ctl.io)
+  gem.authors = %w(Michael Arnold, Laura Frank)
+  gem.email = %w(hi@laura.is)
   gem.description = 'Flatcar is a command line tool to simplify the development of Ruby on Rails web applications that
                      are intended to be deployed and run in production as containerized Docker microservices.'
   gem.summary = 'A CLI for Ruby on Rails web applications to be deployed as containerized Docker services'
-  gem.homepage = 'https://github.com/centurylinklabs/flatcar'
+  gem.homepage = 'https://github.com/flatcar/flatcar'
   gem.license = 'Apache 2'
   gem.platform = Gem::Platform::RUBY
   gem.files = `git ls-files`.split($\)
