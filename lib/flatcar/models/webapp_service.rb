@@ -46,15 +46,15 @@ module Flatcar
       case @base_image
       when 'alpine'
         [
-          'FROM centurylink/alpine-rails'
+          'FROM flatcar/alpine-rails'
         ].join("\n")
       when 'ubuntu'
         [
-          'FROM centurylink/ubuntu-rails'
+          'FROM flatcar/ubuntu-rails'
         ].join("\n")
       when 'debian'
         [
-          'FROM centurylink/debian-rails'
+          'FROM flatcar/debian-rails'
         ].join("\n")
       else
         [
