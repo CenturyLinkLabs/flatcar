@@ -1,4 +1,8 @@
 # Flatcar
+## NOTE
+
+This repo is no longer being maintained. Users are welcome to fork it, but we make no warranty of its functionality.
+
 
 Developing Rails applications with Docker is easy with Flatcar. Using native Docker commands, Flatcar will build
 your application and link it to whatever database you choose to use.
