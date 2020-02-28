@@ -22,7 +22,7 @@ Gem::Specification.new do |gem|
   gem.required_ruby_version = '>= 2.2.2'
   gem.add_dependency 'gli', '2.13.1'
   gem.add_dependency 'rails', '~> 4.2'
-  gem.add_development_dependency 'rake', '~> 10.4'
+  gem.add_development_dependency 'rake', '~> 13.0'
   gem.add_development_dependency 'rspec', '~> 3.3'
   gem.add_development_dependency 'simplecov', '~> 0.10.0'
   gem.add_development_dependency 'simplecov-rcov', '~> 0.2.3'
